@@ -1,6 +1,8 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 import view from './view.js';
+import i18next from 'i18next';
+import ru from './russian.js';
 
 const state = {
   formState: {
@@ -21,7 +23,7 @@ const loading = (watchedState, url) => {
 };
 
 const validate = (url, urlList) => {
-  const schema = yup.string().url('Ссылка должна быть валидным URL').notOneOf(urlList, 'RSS уже существует');
+  const schema = yup.string().url('errorNotValid').required('errorNotFilledIn').notOneOf(urlList, 'errorNotUnique');
 
   return schema
     .validate(url)
@@ -37,10 +39,20 @@ export default () => {
     sendButton: document.querySelector('[type="submit"]'),
   };
 
-  const watchedState = onChange(state, view(state, elements));
+  const i18nextInstance = i18next.createInstance();
+
+  i18nextInstance.init({
+    debug: true,
+    lng: 'ru',
+    resources: {
+      ru,
+    },
+  }).then(() => {
+    const watchedState = onChange(state, view(state, elements, i18nextInstance));
 
   elements.form.addEventListener('submit', ((event) => {
     event.preventDefault();
+
     const data = new FormData(event.target);
     const url = data.get('url').trim();
     watchedState.formState.status = 'processing';
@@ -57,4 +69,5 @@ export default () => {
       loading(watchedState, url);
     });
   }));
-};
+  }
+)};
