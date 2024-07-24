@@ -95,6 +95,16 @@ const renderFeeds = (state, elements, i18nextInstance) => {
   list.append(...items);
 };
 
+const renderButton = (item, i18nextInstance) => {
+  const button = document.createElement('button');
+  button.setAttribute('type', 'button');
+  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  button.dataset.id = item.postId;
+  button.dataset.bsToggle = 'modal';
+  button.dataset.bsTarget = '#modal';
+  button.textContent = i18nextInstance.t('preview');
+};
+
 const renderPosts = (state, elements, i18nextInstance) => {
   const { postsCol } = elements;
   const { posts, ui } = state;
@@ -111,9 +121,15 @@ const renderPosts = (state, elements, i18nextInstance) => {
 
   const items = posts.map((item) => {
     const li = document.createElement('li');
-    // const button = document.createElement('button');
     const link = document.createElement('a');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    li.classList.add(
+      'list-group-item',
+      'd-flex',
+      'justify-content-between',
+      'align-items-start',
+      'border-0',
+      'border-end-0',
+    );
 
     link.classList.add('fw-bold');
     link.setAttribute('href', `${item.postLink}`);
@@ -136,17 +152,6 @@ const renderPosts = (state, elements, i18nextInstance) => {
   list.append(...items);
 };
 
-const renderButton = (item, i18nextInstance) => {
-  const button = document.createElement('button');
-  button.setAttribute('type', 'button');
-  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.dataset.id = item.postId;
-  button.dataset.bsToggle = 'modal';
-  button.dataset.bsTarget = '#modal';
-  button.textContent = i18nextInstance.t('preview');
-  return button;
-};
-
 const renderModal = (state, elements) => {
   const { modal } = elements;
   const { posts, ui } = state;
@@ -161,30 +166,31 @@ const renderModal = (state, elements) => {
   button.setAttribute('href', `${viewPost.postLink}`);
 };
 
-export default (state, elements, i18nextInstance) => onChange(state, (path, value) => {
-  switch (path) {
-    case 'form.status':
-      renderForm(state, elements, value, i18nextInstance);
-      break;
+export default (state, elements, i18nextInstance) =>
+  onChange(state, (path, value) => {
+    switch (path) {
+      case 'form.status':
+        renderForm(state, elements, value, i18nextInstance);
+        break;
 
-    case 'downloadProcess.status':
-      renderLoading(state, elements, value, i18nextInstance);
-      break;
+      case 'downloadProcess.status':
+        renderLoading(state, elements, value, i18nextInstance);
+        break;
 
-    case 'feeds':
-      renderFeeds(state, elements, i18nextInstance);
-      break;
+      case 'feeds':
+        renderFeeds(state, elements, i18nextInstance);
+        break;
 
-    case 'posts':
-      renderPosts(state, elements, i18nextInstance);
-      break;
+      case 'posts':
+        renderPosts(state, elements, i18nextInstance);
+        break;
 
-    case 'ui.id':
-      renderPosts(state, elements, i18nextInstance);
-      renderModal(state, elements);
-      break;
+      case 'ui.id':
+        renderPosts(state, elements, i18nextInstance);
+        renderModal(state, elements);
+        break;
 
-    default:
-      break;
-  }
-});
+      default:
+        break;
+    }
+  });

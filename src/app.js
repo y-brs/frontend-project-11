@@ -36,21 +36,25 @@ const handleError = (error) => {
 const checkNewPosts = (watchedState) => {
   const { feeds } = watchedState;
 
-  const promises = feeds.map((feed) => proxy(feed.url)
-    .then((response) => {
-      const { posts } = parser(response.data.contents);
-      const newPosts = posts
-        .filter((post) => !watchedState.posts
-        .some((item) => post.postTitle === item.postTitle));
+  const promises = feeds.map((feed) =>
+    proxy(feed.url)
+      .then((response) => {
+        const { posts } = parser(response.data.contents);
+        const newPosts = posts.filter(
+          (post) =>
+            !watchedState.posts.some(
+              (item) => post.postTitle === item.postTitle,
+            ),
+        );
 
-      watchedState.posts.push(...newPosts);
-    })
-    .catch(() => {}));
+        watchedState.posts.push(...newPosts);
+      })
+      .catch(() => {}),
+  );
 
-  Promise.all(promises)
-    .then(() => {
-      setTimeout(() => checkNewPosts(watchedState), 5000);
-    });
+  Promise.all(promises).then(() => {
+    setTimeout(() => checkNewPosts(watchedState), 5000);
+  });
 };
 
 const download = (watchedState, url) => {
@@ -71,14 +75,15 @@ const download = (watchedState, url) => {
 };
 
 const validate = (url, urlList) => {
-  const schema = yup.string()
+  const schema = yup
+    .string()
     .url('errors.notUrl')
     .required('errors.required')
     .notOneOf(urlList, 'errors.exists');
 
   return schema
     .validate(url)
-    .then(() => { })
+    .then(() => {})
     .catch((e) => e);
 };
 
@@ -95,45 +100,47 @@ export default () => {
 
   const i18nextInstance = i18next.createInstance();
 
-  i18nextInstance.init({
-    debug: false,
-    lng: 'ru',
-    resources: {
-      ru: resources.russian,
-    },
-  }).then(() => {
-    const watchedState = watch(state, elements, i18nextInstance);
+  i18nextInstance
+    .init({
+      debug: false,
+      lng: 'ru',
+      resources: {
+        ru: resources.russian,
+      },
+    })
+    .then(() => {
+      const watchedState = watch(state, elements, i18nextInstance);
 
-    elements.form.addEventListener('submit', ((event) => {
-      event.preventDefault();
+      elements.form.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-      const data = new FormData(event.target);
-      const url = data.get('url').trim();
+        const data = new FormData(event.target);
+        const url = data.get('url').trim();
 
-      watchedState.form.status = 'processing';
-      const urlList = watchedState.feeds.map((feed) => feed.url);
+        watchedState.form.status = 'processing';
+        const urlList = watchedState.feeds.map((feed) => feed.url);
 
-      validate(url, urlList).then((error) => {
-        if (error) {
-          watchedState.form.error = error.message;
-          watchedState.form.status = 'failed';
-          return;
-        }
+        validate(url, urlList).then((error) => {
+          if (error) {
+            watchedState.form.error = error.message;
+            watchedState.form.status = 'failed';
+            return;
+          }
 
-        watchedState.form.error = '';
-        download(watchedState, url);
+          watchedState.form.error = '';
+          download(watchedState, url);
+        });
       });
-    }));
 
-    elements.postsCol.addEventListener('click', (event) => {
-      const { id } = event.target.dataset;
+      elements.postsCol.addEventListener('click', (event) => {
+        const { id } = event.target.dataset;
 
-      if (id) {
-        watchedState.ui.viewedPosts.add(id);
-        watchedState.ui.id = id;
-      }
+        if (id) {
+          watchedState.ui.viewedPosts.add(id);
+          watchedState.ui.id = id;
+        }
+      });
+
+      checkNewPosts(watchedState);
     });
-
-    checkNewPosts(watchedState);
-  });
 };
