@@ -1,3 +1,6 @@
+/* eslint implicit-arrow-linebreak: off */
+/* eslint function-paren-newline: off */
+
 import * as yup from 'yup';
 import i18next from 'i18next';
 import resources from './locales/index.js';
@@ -51,7 +54,6 @@ const checkNewPosts = (watchedState) => {
       })
       .catch(() => {}),
   );
-
   Promise.all(promises).then(() => {
     setTimeout(() => checkNewPosts(watchedState), 5000);
   });
