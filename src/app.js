@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import view from './view.js';
 import i18next from 'i18next';
-import ru from './russian.js';
+import resources from './locales/index.js';
 import proxy from './proxy.js';
 import parser from './parser.js';
 
@@ -11,7 +11,7 @@ const state = {
     status: '',
     error: '',
   },
-  statusLoading: {
+  loadingProcess: {
     status: '',
     error: '',
   },
@@ -38,22 +38,22 @@ const checkNewPosts = (watchedState) => {
 };
 
 const loading = (watchedState, url) => {
-  const { statusLoading } = watchedState;
+  const { loadingProcess } = watchedState;
 
   proxy(url)
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
 
       feed.url = url;
-      statusLoading.status = 'succsess';
+      loadingProcess.status = 'succsess';
       watchedState.urls.push(url);
       watchedState.feeds.push(feed);
       watchedState.posts.push(...posts);
-      statusLoading.status = '';
+      loadingProcess.status = '';
     })
     .catch(() => {
-      statusLoading.error = 'errorNetwork';
-      statusLoading.status = 'failed';
+      loadingProcess.error = 'errorNetwork';
+      loadingProcess.status = 'failed';
     });
 };
 
@@ -81,7 +81,7 @@ export default () => {
   i18nextInstance.init({
     lng: 'ru',
     resources: {
-      ru,
+      ru: resources.russian,
     },
   }).then(() => {
     const watchedState = onChange(state, view(state, elements, i18nextInstance));
