@@ -1,3 +1,5 @@
+/* eslint testing-library/render-result-naming-convention: off */
+
 import onChange from 'on-change';
 
 const renderForm = (state, elements, status, i18nextInstance) => {
@@ -97,12 +99,15 @@ const renderFeeds = (state, elements, i18nextInstance) => {
 
 const renderButton = (item, i18nextInstance) => {
   const button = document.createElement('button');
+
   button.setAttribute('type', 'button');
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
   button.dataset.id = item.postId;
   button.dataset.bsToggle = 'modal';
   button.dataset.bsTarget = '#modal';
   button.textContent = i18nextInstance.t('preview');
+
+  return button;
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
