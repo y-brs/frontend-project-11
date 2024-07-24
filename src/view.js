@@ -1,5 +1,3 @@
-/* eslint testing-library/render-result-naming-convention: off */
-
 import onChange from 'on-change';
 
 const renderForm = (state, elements, status, i18nextInstance) => {
