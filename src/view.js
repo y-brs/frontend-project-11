@@ -45,7 +45,7 @@ const renderFeeds = (state, elements, i18nextInstance) => {
   feedsCol.innerHTML = '';
 
   if (!feedsCol.hasChildNodes()) {
-    const card = handleCard(i18nextInstance.t('sectionTitle.feeds'));
+    const card = handleCard(i18nextInstance.t('feeds'));
     feedsCol.append(card);
   }
 
@@ -73,12 +73,12 @@ const renderFeeds = (state, elements, i18nextInstance) => {
 
 const renderPosts = (state, elements, i18nextInstance) => {
   const { postsCol } = elements;
-  const { posts } = state;
+  const { posts, ui } = state;
 
   postsCol.innerHTML = '';
 
   if (!postsCol.hasChildNodes()) {
-    const card = handleCard(i18nextInstance.t('sectionTitle.posts'));
+    const card = handleCard(i18nextInstance.t('posts'));
     postsCol.append(card);
   }
 
@@ -87,15 +87,30 @@ const renderPosts = (state, elements, i18nextInstance) => {
 
   const items = posts.map((item) => {
     const li = document.createElement('li');
+    const button = document.createElement('button');
     const link = document.createElement('a');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+
     link.classList.add('fw-bold');
     link.setAttribute('href', `${item.postLink}`);
     link.setAttribute('target', '_blank');
     link.setAttribute('rel', 'nofollow noreferrer');
+    link.setAttribute('data-id', `${item.postId}`);
     link.textContent = item.postTitle;
-    li.append(link);
 
+    button.setAttribute('type', 'button');
+    button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    button.dataset.id = item.postId;
+    button.dataset.bsToggle = 'modal';
+    button.dataset.bsTarget = '#modal';
+    button.textContent = i18nextInstance.t('preview');
+
+    if (ui.viewedPosts.has(item.postId)) {
+      link.classList.add('fw-normal', 'link-secondary');
+      link.classList.remove('fw-bold');
+    }
+
+    li.append(link, button);
     return li;
   });
 
@@ -106,8 +121,8 @@ const renderLoading = (state, elements, status, i18nextInstance) => {
   const { downloadProcess } = state;
   const { input, feedback, sendButton } = elements;
 
-  if (status === 'succsess') {
-    feedback.textContent = i18nextInstance.t('success');
+  if (status === 'success') {
+    feedback.textContent = i18nextInstance.t('loading.success');
     feedback.classList.add('text-success');
     sendButton.removeAttribute('disabled');
     input.removeAttribute('disabled');
@@ -125,6 +140,20 @@ const renderLoading = (state, elements, status, i18nextInstance) => {
   }
 };
 
+const renderModal = (state, elements) => {
+  const { modal } = elements;
+  const { posts, ui } = state;
+
+  const title = modal.querySelector('.modal-title');
+  const description = modal.querySelector('.modal-body');
+  const button = modal.querySelector('.modal-footer > a');
+  const viewPost = posts.find((post) => post.postId === ui.id);
+
+  title.textContent = viewPost.postTitle;
+  description.textContent = viewPost.postDescription;
+  button.setAttribute('href', `${viewPost.postLink}`);
+};
+
 export default (state, elements, i18nextInstance) => (path, value) => {
   if (path === 'form.status') {
     renderForm(state, elements, value, i18nextInstance);
@@ -140,5 +169,10 @@ export default (state, elements, i18nextInstance) => (path, value) => {
 
   if (path === 'posts') {
     renderPosts(state, elements, i18nextInstance);
+  }
+
+  if (path === 'ui.id') {
+    renderPosts(state, elements, i18nextInstance);
+    renderModal(state, elements);
   }
 };

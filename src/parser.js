@@ -9,8 +9,8 @@ export default (data) => {
 
   const feedTitle = rss.querySelector('title').textContent;
   const feedDescription = rss.querySelector('description').textContent;
-  const feedId = _.uniqueId();
-  const feed = { feedTitle, feedDescription, feedId };
+  const feed = { feedTitle, feedDescription, feedId: _.uniqueId() };
+  const { feedId } = feed;
 
   const items = [...document.querySelectorAll('item')];
 
@@ -25,11 +25,11 @@ export default (data) => {
       postDescription,
       postLink,
       postId,
+      feedId,
     };
 
     return post;
   });
 
-  // console.log(feed, posts);
   return { feed, posts };
 };

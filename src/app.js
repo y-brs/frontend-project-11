@@ -18,6 +18,10 @@ const state = {
   feeds: [],
   posts: [],
   urls: [],
+  ui: {
+    id: null,
+    viewedPosts: new Set(),
+  },
 };
 
 const checkNewPosts = (watchedState) => {
@@ -45,7 +49,7 @@ const loading = (watchedState, url) => {
       const { feed, posts } = parser(response.data.contents);
 
       feed.url = url;
-      loadingProcess.status = 'succsess';
+      loadingProcess.status = 'success';
       watchedState.urls.push(url);
       watchedState.feeds.push(feed);
       watchedState.posts.push(...posts);
@@ -58,7 +62,11 @@ const loading = (watchedState, url) => {
 };
 
 const validate = (url, urlList) => {
-  const schema = yup.string().url('errorNotValid').required('errorNotFilledIn').notOneOf(urlList, 'errorNotUnique');
+  const schema = yup
+    .string()
+    .url('errors.notUrl')
+    .required('errors.required')
+    .notOneOf(urlList, 'errors.exists');
 
   return schema
     .validate(url)
@@ -74,6 +82,7 @@ export default () => {
     sendButton: document.querySelector('[type="submit"]'),
     feedsCol: document.querySelector('.feeds'),
     postsCol: document.querySelector('.posts'),
+    modal: document.querySelector('.modal'),
   };
 
   const i18nextInstance = i18next.createInstance();
@@ -107,6 +116,15 @@ export default () => {
         watchedState.form.status = '';
       });
     }));
+
+    elements.postsCol.addEventListener('click', (event) => {
+      const { id } = event.target.dataset;
+
+      if (id) {
+        watchedState.ui.viewedPosts.add(id);
+        watchedState.ui.id = id;
+      };
+    });
 
     checkNewPosts(watchedState);
   });
