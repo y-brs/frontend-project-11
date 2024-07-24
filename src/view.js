@@ -111,7 +111,7 @@ const renderPosts = (state, elements, i18nextInstance) => {
 
   const items = posts.map((item) => {
     const li = document.createElement('li');
-    const button = document.createElement('button');
+    // const button = document.createElement('button');
     const link = document.createElement('a');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -122,12 +122,7 @@ const renderPosts = (state, elements, i18nextInstance) => {
     link.setAttribute('data-id', `${item.postId}`);
     link.textContent = item.postTitle;
 
-    button.setAttribute('type', 'button');
-    button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    button.dataset.id = item.postId;
-    button.dataset.bsToggle = 'modal';
-    button.dataset.bsTarget = '#modal';
-    button.textContent = i18nextInstance.t('preview');
+    const button = renderButton(item, i18nextInstance);
 
     if (ui.viewedPosts.has(item.postId)) {
       link.classList.add('fw-normal', 'link-secondary');
@@ -139,6 +134,17 @@ const renderPosts = (state, elements, i18nextInstance) => {
   });
 
   list.append(...items);
+};
+
+const renderButton = (item, i18nextInstance) => {
+  const button = document.createElement('button');
+  button.setAttribute('type', 'button');
+  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  button.dataset.id = item.postId;
+  button.dataset.bsToggle = 'modal';
+  button.dataset.bsTarget = '#modal';
+  button.textContent = i18nextInstance.t('preview');
+  return button;
 };
 
 const renderModal = (state, elements) => {
@@ -156,24 +162,29 @@ const renderModal = (state, elements) => {
 };
 
 export default (state, elements, i18nextInstance) => onChange(state, (path, value) => {
-  if (path === 'form.status') {
-    renderForm(state, elements, value, i18nextInstance);
-  }
+  switch (path) {
+    case 'form.status':
+      renderForm(state, elements, value, i18nextInstance);
+      break;
 
-  if (path === 'downloadProcess.status') {
-    renderLoading(state, elements, value, i18nextInstance);
-  }
+    case 'downloadProcess.status':
+      renderLoading(state, elements, value, i18nextInstance);
+      break;
 
-  if (path === 'feeds') {
-    renderFeeds(state, elements, i18nextInstance);
-  }
+    case 'feeds':
+      renderFeeds(state, elements, i18nextInstance);
+      break;
 
-  if (path === 'posts') {
-    renderPosts(state, elements, i18nextInstance);
-  }
+    case 'posts':
+      renderPosts(state, elements, i18nextInstance);
+      break;
 
-  if (path === 'ui.id') {
-    renderPosts(state, elements, i18nextInstance);
-    renderModal(state, elements);
+    case 'ui.id':
+      renderPosts(state, elements, i18nextInstance);
+      renderModal(state, elements);
+      break;
+
+    default:
+      break;
   }
 });
