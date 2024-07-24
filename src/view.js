@@ -1,3 +1,5 @@
+/* eslint implicit-arrow-linebreak: off */
+
 import onChange from 'on-change';
 
 const renderForm = (state, elements, status, i18nextInstance) => {
@@ -95,19 +97,6 @@ const renderFeeds = (state, elements, i18nextInstance) => {
   list.append(...items);
 };
 
-const renderButton = (item, i18nextInstance) => {
-  const button = document.createElement('button');
-
-  button.setAttribute('type', 'button');
-  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.dataset.id = item.postId;
-  button.dataset.bsToggle = 'modal';
-  button.dataset.bsTarget = '#modal';
-  button.textContent = i18nextInstance.t('preview');
-
-  return button;
-};
-
 const renderPosts = (state, elements, i18nextInstance) => {
   const { postsCol } = elements;
   const { posts, ui } = state;
@@ -124,6 +113,7 @@ const renderPosts = (state, elements, i18nextInstance) => {
 
   const items = posts.map((item) => {
     const li = document.createElement('li');
+    const button = document.createElement('button');
     const link = document.createElement('a');
     li.classList.add(
       'list-group-item',
@@ -141,7 +131,12 @@ const renderPosts = (state, elements, i18nextInstance) => {
     link.setAttribute('data-id', `${item.postId}`);
     link.textContent = item.postTitle;
 
-    const button = renderButton(item, i18nextInstance);
+    button.setAttribute('type', 'button');
+    button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    button.dataset.id = item.postId;
+    button.dataset.bsToggle = 'modal';
+    button.dataset.bsTarget = '#modal';
+    button.textContent = i18nextInstance.t('preview');
 
     if (ui.viewedPosts.has(item.postId)) {
       link.classList.add('fw-normal', 'link-secondary');
