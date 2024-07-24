@@ -1,3 +1,5 @@
+import onChange from 'on-change';
+
 const renderForm = (state, elements, status, i18nextInstance) => {
   const { form } = state;
   const { input, feedback, sendButton } = elements;
@@ -17,6 +19,28 @@ const renderForm = (state, elements, status, i18nextInstance) => {
     input.removeAttribute('disabled');
     sendButton.removeAttribute('disabled');
     input.focus();
+  }
+};
+
+const renderLoading = (state, elements, status, i18nextInstance) => {
+  const { downloadProcess } = state;
+  const { input, feedback, sendButton } = elements;
+
+  if (status === 'succsess') {
+    feedback.textContent = i18nextInstance.t('loading.success');
+    feedback.classList.add('text-success');
+    sendButton.removeAttribute('disabled');
+    input.removeAttribute('disabled');
+    input.value = '';
+    input.focus();
+  }
+
+  if (status === 'failed') {
+    feedback.textContent = i18nextInstance.t(downloadProcess.error);
+    feedback.classList.add('text-danger');
+    input.classList.add('is-invalid');
+    input.removeAttribute('disabled');
+    sendButton.removeAttribute('disabled');
   }
 };
 
@@ -117,29 +141,6 @@ const renderPosts = (state, elements, i18nextInstance) => {
   list.append(...items);
 };
 
-const renderLoading = (state, elements, status, i18nextInstance) => {
-  const { downloadProcess } = state;
-  const { input, feedback, sendButton } = elements;
-
-  if (status === 'success') {
-    feedback.textContent = i18nextInstance.t('loading.success');
-    feedback.classList.add('text-success');
-    sendButton.removeAttribute('disabled');
-    input.removeAttribute('disabled');
-    input.value = '';
-    input.focus();
-  }
-
-  if (status === 'failed') {
-    feedback.textContent = i18nextInstance.t(downloadProcess.error);
-    console.log(downloadProcess.error);
-    feedback.classList.add('text-danger');
-    input.classList.add('is-invalid');
-    input.removeAttribute('disabled');
-    sendButton.removeAttribute('disabled');
-  }
-};
-
 const renderModal = (state, elements) => {
   const { modal } = elements;
   const { posts, ui } = state;
@@ -154,7 +155,7 @@ const renderModal = (state, elements) => {
   button.setAttribute('href', `${viewPost.postLink}`);
 };
 
-export default (state, elements, i18nextInstance) => (path, value) => {
+export default (state, elements, i18nextInstance) => onChange(state, (path, value) => {
   if (path === 'form.status') {
     renderForm(state, elements, value, i18nextInstance);
   }
@@ -175,4 +176,4 @@ export default (state, elements, i18nextInstance) => (path, value) => {
     renderPosts(state, elements, i18nextInstance);
     renderModal(state, elements);
   }
-};
+});

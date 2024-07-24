@@ -1,27 +1,36 @@
 import * as yup from 'yup';
-import onChange from 'on-change';
-import view from './view.js';
 import i18next from 'i18next';
 import resources from './locales/index.js';
+import watch from './view.js';
 import proxy from './proxy.js';
 import parser from './parser.js';
 
 const state = {
   form: {
-    status: '',
+    status: 'idle',
     error: '',
   },
-  loadingProcess: {
-    status: '',
+  downloadProcess: {
+    status: 'idle',
     error: '',
   },
   feeds: [],
   posts: [],
-  urls: [],
   ui: {
     id: null,
     viewedPosts: new Set(),
   },
+};
+
+const handleError = (error) => {
+  if (error.isAxiosError) {
+    return 'errors.network';
+  }
+  if (error.isParserError) {
+    return 'errors.noRss';
+  }
+
+  return 'errors.unknown';
 };
 
 const checkNewPosts = (watchedState) => {
@@ -30,7 +39,10 @@ const checkNewPosts = (watchedState) => {
   const promises = feeds.map((feed) => proxy(feed.url)
     .then((response) => {
       const { posts } = parser(response.data.contents);
-      const newPosts = posts.filter((post) => !watchedState.posts.some((item) => item.postTitle === post.postTitle));
+      const newPosts = posts
+        .filter((post) => !watchedState.posts
+        .some((item) => post.postTitle === item.postTitle));
+
       watchedState.posts.push(...newPosts);
     })
     .catch(() => {}));
@@ -41,29 +53,25 @@ const checkNewPosts = (watchedState) => {
     });
 };
 
-const loading = (watchedState, url) => {
-  const { loadingProcess } = watchedState;
+const download = (watchedState, url) => {
+  const { downloadProcess } = watchedState;
 
   proxy(url)
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
-
       feed.url = url;
-      loadingProcess.status = 'success';
-      watchedState.urls.push(url);
+      downloadProcess.status = 'succsess';
       watchedState.feeds.push(feed);
       watchedState.posts.push(...posts);
-      loadingProcess.status = '';
     })
-    .catch(() => {
-      loadingProcess.error = 'errorNetwork';
-      loadingProcess.status = 'failed';
+    .catch((error) => {
+      downloadProcess.error = handleError(error);
+      downloadProcess.status = 'failed';
     });
 };
 
 const validate = (url, urlList) => {
-  const schema = yup
-    .string()
+  const schema = yup.string()
     .url('errors.notUrl')
     .required('errors.required')
     .notOneOf(urlList, 'errors.exists');
@@ -88,12 +96,13 @@ export default () => {
   const i18nextInstance = i18next.createInstance();
 
   i18nextInstance.init({
+    debug: false,
     lng: 'ru',
     resources: {
       ru: resources.russian,
     },
   }).then(() => {
-    const watchedState = onChange(state, view(state, elements, i18nextInstance));
+    const watchedState = watch(state, elements, i18nextInstance);
 
     elements.form.addEventListener('submit', ((event) => {
       event.preventDefault();
@@ -102,7 +111,7 @@ export default () => {
       const url = data.get('url').trim();
 
       watchedState.form.status = 'processing';
-      const urlList = watchedState.urls.map((urls) => urls);
+      const urlList = watchedState.feeds.map((feed) => feed.url);
 
       validate(url, urlList).then((error) => {
         if (error) {
@@ -112,8 +121,7 @@ export default () => {
         }
 
         watchedState.form.error = '';
-        loading(watchedState, url);
-        watchedState.form.status = '';
+        download(watchedState, url);
       });
     }));
 
@@ -123,7 +131,7 @@ export default () => {
       if (id) {
         watchedState.ui.viewedPosts.add(id);
         watchedState.ui.id = id;
-      };
+      }
     });
 
     checkNewPosts(watchedState);

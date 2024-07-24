@@ -1,18 +1,12 @@
 export default {
   translation: {
-    // errorNotValid: 'Ссылка должна быть валидным URL',
-    // errorNotFilledIn: 'Обязательно для заполнения',
+    // errorNotValid: ' Ссылка должна быть валидным URL',
+    // errorNotFilledIn: 'Не должно быть пустым',
     // errorNotUnique: 'RSS уже существует',
-    // success: 'RSS успешно загружен',
     // errorNetwork: 'Ошибка сети',
-    // invalidRSS: 'Неверный формат RSS',
-    // sectionTitle: {
-    //   feeds: 'Фиды',
-    //   posts: 'Посты',
-    // },
-    // button: {
-    //   buttonTitle: 'Просмотр',
-    // },
+    // invalidRSS: 'Ресурс не содержит валидный RSS',
+    // errorUnknown: 'Неизвестная ошибка',
+
     loading: {
       success: "RSS успешно загружен"
     },
