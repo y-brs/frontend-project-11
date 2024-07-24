@@ -9,7 +9,6 @@ export default [
       'implicit-arrow-linebreak': 'off',
       'function-paren-newline': 'off',
       'no-console': 'off',
-      'testing-library/ender-result-naming-convention': 'off',
     },
   },
 ];

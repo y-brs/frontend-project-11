@@ -1,3 +1,5 @@
+/* eslint implicit-arrow-linebreak: off */
+
 import axios from 'axios';
 
 export default (url) =>
