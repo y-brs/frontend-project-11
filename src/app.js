@@ -49,7 +49,7 @@ const checkNewPosts = (watchedState) => {
             ),
         );
 
-        watchedState.posts.push(...newPosts);
+        watchedState.posts.unshift(...newPosts);
       })
       .catch(() => {}),
   );
@@ -66,8 +66,8 @@ const download = (watchedState, url) => {
       const { feed, posts } = parser(response.data.contents);
       feed.url = url;
       downloadProcess.status = 'succsess';
-      watchedState.feeds.push(feed);
-      watchedState.posts.push(...posts);
+      watchedState.feeds.unshift(feed);
+      watchedState.posts.unshift(...posts);
     })
     .catch((error) => {
       downloadProcess.error = handleError(error);
