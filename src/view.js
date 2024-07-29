@@ -86,9 +86,9 @@ const renderFeeds = (state, elements, i18nextInstance) => {
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
     list.append(li);
     title.classList.add('h6', 'm-0');
-    title.textContent = feed.feedTitle;
+    title.textContent = feed.title;
     description.classList.add('m-0', 'small', 'text-black-50');
-    description.textContent = feed.feedDescription;
+    description.textContent = feed.description;
     li.append(title, description);
 
     return li;
@@ -125,20 +125,20 @@ const renderPosts = (state, elements, i18nextInstance) => {
     );
 
     link.classList.add('fw-bold');
-    link.setAttribute('href', `${item.postLink}`);
+    link.setAttribute('href', `${item.link}`);
     link.setAttribute('target', '_blank');
     link.setAttribute('rel', 'nofollow noreferrer');
-    link.setAttribute('data-id', `${item.postId}`);
-    link.textContent = item.postTitle;
+    link.setAttribute('data-id', `${item.id}`);
+    link.textContent = item.title;
 
     button.setAttribute('type', 'button');
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    button.dataset.id = item.postId;
+    button.dataset.id = item.id;
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#modal';
     button.textContent = i18nextInstance.t('preview');
 
-    if (ui.viewedPosts.has(item.postId)) {
+    if (ui.viewedPosts.has(item.id)) {
       link.classList.add('fw-normal', 'link-secondary');
       link.classList.remove('fw-bold');
     }
@@ -157,11 +157,11 @@ const renderModal = (state, elements) => {
   const title = modal.querySelector('.modal-title');
   const description = modal.querySelector('.modal-body');
   const button = modal.querySelector('.modal-footer > a');
-  const viewPost = posts.find((post) => post.postId === ui.id);
+  const viewPost = posts.find((post) => post.id === ui.id);
 
-  title.textContent = viewPost.postTitle;
-  description.textContent = viewPost.postDescription;
-  button.setAttribute('href', `${viewPost.postLink}`);
+  title.textContent = viewPost.title;
+  description.textContent = viewPost.description;
+  button.setAttribute('href', `${viewPost.link}`);
 };
 
 export default (state, elements, i18nextInstance) =>
