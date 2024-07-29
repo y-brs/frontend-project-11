@@ -168,6 +168,7 @@ export default (state, elements, i18nextInstance) =>
   onChange(state, (path, value) => {
     switch (path) {
       case 'form.status':
+        console.log(state);
         renderForm(state, elements, value, i18nextInstance);
         break;
 

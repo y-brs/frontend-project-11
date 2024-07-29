@@ -6,6 +6,7 @@ import resources from './locales/index.js';
 import watch from './view.js';
 import proxy from './proxy.js';
 import parser from './parser.js';
+import { uniqueId } from 'lodash';
 
 const state = {
   form: {
@@ -44,9 +45,7 @@ const checkNewPosts = (watchedState) => {
         const { posts } = parser(response.data.contents);
         const newPosts = posts.filter(
           (post) =>
-            !watchedState.posts.some(
-              (item) => post.postTitle === item.postTitle,
-            ),
+            !watchedState.posts.some((item) => post.title === item.title),
         );
 
         watchedState.posts.unshift(...newPosts);
@@ -65,6 +64,12 @@ const download = (watchedState, url) => {
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
       feed.url = url;
+      feed.id = uniqueId();
+
+      for (let i = 0; i < posts.length; i += 1) {
+        posts[i].id = uniqueId();
+      }
+
       downloadProcess.status = 'succsess';
       watchedState.feeds.unshift(feed);
       watchedState.posts.unshift(...posts);
@@ -78,6 +83,7 @@ const download = (watchedState, url) => {
 const validate = (url, urlList) => {
   const schema = yup
     .string()
+    .trim()
     .url('errors.notUrl')
     .required('errors.required')
     .notOneOf(urlList, 'errors.exists');
