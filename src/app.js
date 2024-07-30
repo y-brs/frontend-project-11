@@ -76,12 +76,14 @@ const download = (watchedState, url) => {
 };
 
 const validate = (url, feeds) => {
+  const urlList = feeds.map((feed) => feed.url);
+
   const schema = yup
     .string()
     .trim()
     .url('errors.notUrl')
     .required('errors.required')
-    .notOneOf(feeds, 'errors.exists');
+    .notOneOf(urlList, 'errors.exists');
 
   return schema
     .validate(url)
@@ -115,14 +117,11 @@ export default () => {
 
       elements.form.addEventListener('submit', (event) => {
         event.preventDefault();
-
         const data = new FormData(event.target);
         const url = data.get('url');
-
         watchedState.form.status = 'processing';
-        const urlList = watchedState.feeds.map((feed) => feed.url);
 
-        validate(url, urlList).then((error) => {
+        validate(url, watchedState.feeds).then((error) => {
           if (error) {
             watchedState.form.error = error.message;
             watchedState.form.status = 'failed';
