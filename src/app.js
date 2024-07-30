@@ -1,12 +1,12 @@
-/* eslint implicit-arrow-linebreak: off, function-paren-newline: off */
+/* eslint implicit-arrow-linebreak: off, function-paren-newline: off, object-shorthand: off */
 
 import * as yup from 'yup';
+import { uniqueId } from 'lodash';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 import watch from './view.js';
 import proxy from './proxy.js';
 import parser from './parser.js';
-import { uniqueId } from 'lodash';
 
 const state = {
   form: {
@@ -65,7 +65,7 @@ const download = (watchedState, url) => {
       const { feed, posts } = parser(response.data.contents);
       const postsWithId = posts.map((post) => ({ ...post, id: uniqueId() }));
 
-      downloadProcess.status = 'succsess';
+      downloadProcess.status = 'success';
       watchedState.feeds.unshift({ ...feed, id: uniqueId(), url: url });
       watchedState.posts.unshift(...postsWithId);
     })

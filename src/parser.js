@@ -1,3 +1,5 @@
+/* eslint no-shadow: off */
+
 export default (url) => {
   const parser = new DOMParser();
   const document = parser.parseFromString(url, 'application/xml');

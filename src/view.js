@@ -28,7 +28,7 @@ const renderLoading = (state, elements, status, i18nextInstance) => {
   const { downloadProcess } = state;
   const { input, feedback, sendButton } = elements;
 
-  if (status === 'succsess') {
+  if (status === 'success') {
     feedback.textContent = i18nextInstance.t('loading.success');
     feedback.classList.add('text-success');
     sendButton.removeAttribute('disabled');
