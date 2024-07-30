@@ -1,5 +1,3 @@
-import russian from './russian.js';
+import ru from './ru.js';
 
-export default {
-  russian,
-};
+export default { ru };

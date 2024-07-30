@@ -108,9 +108,7 @@ export default () => {
     .init({
       debug: false,
       lng: 'ru',
-      resources: {
-        ru: resources.russian,
-      },
+      resources,
     })
     .then(() => {
       const watchedState = watch(state, elements, i18nextInstance);
