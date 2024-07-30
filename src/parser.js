@@ -1,13 +1,13 @@
 export default (url) => {
   const parser = new DOMParser();
   const document = parser.parseFromString(url, 'application/xml');
-  const error = document.querySelector('parsererror');
-
-  if (error) {
-    throw new Error('noRss');
-  }
-
   const rss = document.querySelector('rss');
+
+  if (!document.contains(rss)) {
+    const error = new Error('parserError');
+    error.isParserError = true;
+    throw error;
+  }
 
   const title = rss.querySelector('title').textContent;
   const description = rss.querySelector('description').textContent;

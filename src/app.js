@@ -63,16 +63,11 @@ const download = (watchedState, url) => {
   proxy(url)
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
-      feed.url = url;
-      feed.id = uniqueId();
-
-      for (let i = 0; i < posts.length; i += 1) {
-        posts[i].id = uniqueId();
-      }
+      const postsWithId = posts.map((post) => ({ ...post, id: uniqueId() }));
 
       downloadProcess.status = 'succsess';
-      watchedState.feeds.unshift(feed);
-      watchedState.posts.unshift(...posts);
+      watchedState.feeds.unshift({ ...feed, id: uniqueId(), url: url });
+      watchedState.posts.unshift(...postsWithId);
     })
     .catch((error) => {
       downloadProcess.error = handleError(error);
@@ -80,13 +75,13 @@ const download = (watchedState, url) => {
     });
 };
 
-const validate = (url, urlList) => {
+const validate = (url, feeds) => {
   const schema = yup
     .string()
     .trim()
     .url('errors.notUrl')
     .required('errors.required')
-    .notOneOf(urlList, 'errors.exists');
+    .notOneOf(feeds, 'errors.exists');
 
   return schema
     .validate(url)
@@ -122,7 +117,7 @@ export default () => {
         event.preventDefault();
 
         const data = new FormData(event.target);
-        const url = data.get('url').trim();
+        const url = data.get('url');
 
         watchedState.form.status = 'processing';
         const urlList = watchedState.feeds.map((feed) => feed.url);
@@ -136,6 +131,7 @@ export default () => {
 
           watchedState.form.error = '';
           download(watchedState, url);
+          watchedState.form.status = 'processing';
         });
       });
 
